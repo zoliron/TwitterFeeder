@@ -1,6 +1,10 @@
 package util;
 
 import main.ExtractedLink;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 
 /**
  * Extract content from links
@@ -18,6 +22,17 @@ public class LinkExtractor {
     take the first.
      */
 
-    return null;
+	  Document doc = null;
+	  try{
+		  doc = Jsoup.connect(url).get();
+	  } catch (IOException e){
+		  e.printStackTrace();
+	  }
+	  assert doc != null;
+	  String title = doc.title();
+	  String content = doc.body().text();
+      ExtractedLink extractedLink = new ExtractedLink(url, content, title, null, null);
+
+    return extractedLink;
   }
 }

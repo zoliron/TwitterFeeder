@@ -1,49 +1,49 @@
 package main;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import util.DataStorage;
 import util.LinkExtractor;
+import util.ScreenshotGenerator;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 public class LinkListener {
-  public static void main(String[] args) throws SQLException {
+  public static void main(String[] args) throws SQLException, InterruptedException {
     // Connect to the database
-    DataStorage dataStorage = new DataStorage();
+//    DataStorage dataStorage = new DataStorage("noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com");
 
     // Initiate our link extractor
     LinkExtractor linkExtractor = new LinkExtractor();
 
     // Listen to SQS for arriving links
-
     // Configure our client
     AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
-// Send message to a Queue
-    client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", "Our Message");
-
     // Extract the link content
-    // ...
+    while(true) {
+	    ReceiveMessageResult result = client.receiveMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai");
 
-    // Take screenshot
-//	  static String take(String url){
-//      UUID uuid = UUID.randomUUID();
-//      String filename = "screenshots\\" + uuid.toString() + ".png";
-//      String[] cmd = { "node", "screenshot\\screenshot.js", url, filename };
-//      try{
-//        Process process = Runtime.getRuntime().exec(cmd);
-//        process.waitFor();
-//
-////        return filename;
-//      } catch (IOException e){
-//        e.printStackTrace();
-//      } catch (InterruptedException e){
-//        e.printStackTrace();
-//      }
-//
-//      return null;
-//    }
+	    List<Message> messages = result.getMessages();
+	    if (messages.size() == 0){
+	    	Thread.sleep(5000);
+	    } else {
+	    	for (Message message : messages){
+	    		String url = message.getBody();
+	    		// Extracting the Url content
+				ExtractedLink extractedLink = linkExtractor.extractContent(url);
+			    System.out.println("URL: " + extractedLink.getUrl());
+			    System.out.println("Title: " + extractedLink.getTitle());
+			    System.out.println("Content: " + extractedLink.getContent());
+			    // Take screenshot
+			    String fileLocation = ScreenshotGenerator.takeScreenshot(url);
+			    System.out.println("Screenshot location: " + fileLocation);
+		    }
+	    }
+    }
 
     // Save everything in the database
   }

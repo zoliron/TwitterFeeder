@@ -13,7 +13,10 @@ import java.io.IOException;
 public class TwitterListener {
   public static void main(String[] args)  {
     // Create our twitter configuration
-    ConfigurationBuilder cb = new ConfigurationBuilder();
+    final ConfigurationBuilder cb = new ConfigurationBuilder();
+
+    // Create AmazonSQS
+    final AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
 
     cb.setDebugEnabled(true)
         .setOAuthConsumerKey("LFAkkd57cv7VqF7UJuTyAQ7Ry")
@@ -23,38 +26,28 @@ public class TwitterListener {
 
     // Create our Twitter stream
     TwitterStreamFactory tf = new TwitterStreamFactory(cb.build());
-    TwitterStream twitterStream = tf.getInstance();
+    final TwitterStream twitterStream = tf.getInstance();
 
     /*
       This is where we should start fetching the tweets using the Streaming API
       See Example 9 on this page: http://twitter4j.org/en/code-examples.html#streaming
     */
 
-      StatusListener listener = new StatusListener(){
+      final StatusListener listener = new StatusListener(){
           public void onStatus(Status status){
               if (status.getLang().equals("en")){
                   URLEntity[] urlEntities = status.getURLEntities();
                   if (urlEntities.length > 0){
                       for (URLEntity entity : urlEntities){
-                          Document doc = null;
-                          try{
-                              doc = Jsoup.connect(entity.getExpandedURL()).get();
-                          } catch (IOException e){
-                              e.printStackTrace();
-                          }
-                          assert doc != null;
                           String link = entity.getExpandedURL();
-
                           // Sending the links to SQS
-	                      AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
 	                      client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", link);
 
-//                          String title = doc.title();
-//                          String body = doc.body().text();
 //                          String screenshot = Screenshot.take(link);
 //                          IA.insert(status.getId(), status.getCreatedAt().toString(), link, title, body, screenshot);
 //                          System.out.println("TweetID: " +  status.getId() + " CreatedAt:  " + status.getCreatedAt().toString() + System.lineSeparator() + "Link: " + link  +  System.lineSeparator() + "Title: " + title + System.lineSeparator() + "Body: " + body);
-                           System.out.println("Link: " + link);                     }
+//                           System.out.println("Link: " + link);
+                      }
                   }
               }
           }
