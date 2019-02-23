@@ -9,7 +9,7 @@ public class ScreenshotGenerator {
 
     //Run our screenshot generator program
 	  UUID uuid = UUID.randomUUID();
-	  screenshotFilePath = "screenshot\\" + uuid.toString() + ".png";
+	  screenshotFilePath = "screenshots\\" + uuid.toString() + ".png";
 	  String[] cmd = { "node", "screenshots\\screenshot.js", url, screenshotFilePath };
 	  try{
 		  Process process = Runtime.getRuntime().exec(cmd);
@@ -24,7 +24,7 @@ public class ScreenshotGenerator {
   }
 	public static void main(String[] args){
 		ScreenshotGenerator screenshotGenerator = new ScreenshotGenerator();
-		String filelocation = takeScreenshot("www.google.com");
+		String filelocation = takeScreenshot("http://google.com");
 		System.out.println(filelocation);
 	}
 }
