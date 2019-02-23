@@ -1,6 +1,6 @@
 package util;
 
-import il.ac.colman.cs.ExtractedLink;
+import main.ExtractedLink;
 
 /**
  * Extract content from links

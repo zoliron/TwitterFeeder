@@ -1,3 +1,5 @@
+package main;
+
 public class ExtractedLink {
   private final String url;
   private final String content;

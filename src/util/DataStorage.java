@@ -1,12 +1,10 @@
 package util;
 
-import il.ac.colman.cs.ExtractedLink;
+import main.ExtractedLink;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**

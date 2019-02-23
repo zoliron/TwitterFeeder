@@ -1,5 +1,8 @@
-import il.ac.colman.cs.util.DataStorage;
-import il.ac.colman.cs.util.LinkExtractor;
+package main;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import util.DataStorage;
+import util.LinkExtractor;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -14,6 +17,7 @@ public class LinkListener {
     LinkExtractor linkExtractor = new LinkExtractor();
 
     // Listen to SQS for arriving links
+
     // Configure our client
     AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
 // Send message to a Queue
@@ -23,22 +27,23 @@ public class LinkListener {
     // ...
 
     // Take screenshot
-    static String take(String url){
-      UUID uuid = UUID.randomUUID();
-      String filename = "screenshots\\" + uuid.toString() + ".png";
-      String[] cmd = { "node", "screenshot\\screenshot.js", url, filename };
-      try{
-        Process process = Runtime.getRuntime().exec(cmd);
-        process.waitFor();
-        return filename;
-      } catch (IOException e){
-        e.printStackTrace();
-      } catch (InterruptedException e){
-        e.printStackTrace();
-      }
-
-      return null;
-    }
+//	  static String take(String url){
+//      UUID uuid = UUID.randomUUID();
+//      String filename = "screenshots\\" + uuid.toString() + ".png";
+//      String[] cmd = { "node", "screenshot\\screenshot.js", url, filename };
+//      try{
+//        Process process = Runtime.getRuntime().exec(cmd);
+//        process.waitFor();
+//
+////        return filename;
+//      } catch (IOException e){
+//        e.printStackTrace();
+//      } catch (InterruptedException e){
+//        e.printStackTrace();
+//      }
+//
+//      return null;
+//    }
 
     // Save everything in the database
   }
