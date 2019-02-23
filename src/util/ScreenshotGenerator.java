@@ -10,7 +10,7 @@ public class ScreenshotGenerator {
     //Run our screenshot generator program
 	  UUID uuid = UUID.randomUUID();
 	  screenshotFilePath = "screenshot\\" + uuid.toString() + ".png";
-	  String[] cmd = { "node", "F:\\Workspace\\TwitterNew\\screenshots\\screenshot.js", url, screenshotFilePath };
+	  String[] cmd = { "node", "screenshots\\screenshot.js", url, screenshotFilePath };
 	  try{
 		  Process process = Runtime.getRuntime().exec(cmd);
 		  process.waitFor();
