@@ -42,11 +42,6 @@ public class TwitterListener {
                           String link = entity.getExpandedURL();
                           // Sending the links to SQS
 	                      client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", link);
-
-//                          String screenshot = Screenshot.take(link);
-//                          IA.insert(status.getId(), status.getCreatedAt().toString(), link, title, body, screenshot);
-//                          System.out.println("TweetID: " +  status.getId() + " CreatedAt:  " + status.getCreatedAt().toString() + System.lineSeparator() + "Link: " + link  +  System.lineSeparator() + "Title: " + title + System.lineSeparator() + "Body: " + body);
-//                           System.out.println("Link: " + link);
                       }
                   }
               }

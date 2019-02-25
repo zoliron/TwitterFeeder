@@ -2,68 +2,113 @@ package util;
 
 import main.ExtractedLink;
 
-import javax.xml.crypto.Data;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 /**
  * Abstraction layer for database access
  */
 public class DataStorage {
-	private static final Logger logger = Logger.getLogger(DataStorage.class.getName());
-    Connection conn;
+	Connection conn;
 
-	public DataStorage() throws SQLException {
-    this("twitterlinks.db");
-  }
+	public DataStorage() {
+		createNewTable();
+	}
 
-  public DataStorage(String database) throws SQLException {
-    String url = "jdbc:sqlserver:" + database;
-    conn = DriverManager.getConnection(url);
-  }
+	/**
+	 * Connect to a sample database
+	 */
+	public static Connection connect() {
+		Connection conn = null;
+		try {
+			// AWS RDS parameters
+			String url = "jdbc:mysql://noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com/TwitterFeeder";
+			String username = "noyIshai";
+			String password = "abc552346";
 
-  private static Connection getRemoteConnection() {
-      try {
-        Class.forName("org.sqlserver.Driver");
-        String dbName = "noyishai-db-instance";
-        String userName = "noyishai1@gmail.com";
-        String password = "abc552346";
-        String hostname = "noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com";
-        String port = "3306";
-        String jdbcUrl = "jdbc:sqlserver://" + hostname + ":" + port + "/" + dbName + "?user=" + userName + "&password=" + password;
-        //logger.trace("Getting remote connection with connection string from environment variables.");
-        Connection con = DriverManager.getConnection(jdbcUrl);
-        logger.info("Remote connection successful.");
-        return con;
-      }
-      catch (ClassNotFoundException e) { /*logger.warn(e.toString());*/}
-      catch (SQLException e) { /*logger.warn(e.toString());*/}
+			// create a connection to the database
+			conn = DriverManager.getConnection(url, username, password);
+			System.out.println("Connection to RDS has been established.");
+			return conn;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-      return null;
-  }
+		public static void createNewTable() {
+		Connection conn = null;
+		Statement setupStatement = null;
+		try {
+//			// AWS RDS parameters
+//			String url = "jdbc:mysql://noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com/TwitterFeeder";
+//			String username = "noyIshai";
+//			String password = "abc552346";
+//
+//			// create a connection to the database
+//			conn = DriverManager.getConnection(url, username, password);
+			conn = connect();
+			setupStatement = conn.createStatement();
 
-  /**
-   * Add link to the database
-   */
-  public void addLink(ExtractedLink link, String track) {
+			// SQL statement for creating a new table
+			String sql = "CREATE TABLE IF NOT EXISTS TF (\n"
+//					+ "	ID integer PRIMARY KEY,\n"
+					+ "	Link text,\n"
+					+ "	Title text,\n"
+					+ "	Body text,\n"
+					+ " Description text,\n"
+					+ " ScreenshotUrl text,\n"
+					+ " Track text\n"
+					+ ");";
+
+			setupStatement.addBatch(sql);
+			setupStatement.executeBatch();
+			setupStatement.close();
+		} catch (SQLException e) {
+			System.out.println("Error Creating New Table: ");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Add link to the database
+	 */
+	public void addLink(ExtractedLink link, String track) throws SQLException {
     /*
     This is where we'll add our link
      */
-  }
+		String sql = "INSERT INTO TF(Link,Title,Body,Description,ScreenshotUrl,Track) VALUES(?,?,?,?,?,?)";
 
-  /**
-   * Search for a link
-   * @param query The query to search
-   */
-  public List<ExtractedLink> search(String query) {
+		try (Connection conn = connect();
+		     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, link.getUrl());
+			pstmt.setString(2, link.getTitle());
+			pstmt.setString(3, link.getContent());
+			pstmt.setString(4, link.getDescription());
+			pstmt.setString(5, link.getScreenshotURL());
+			pstmt.setString(6, track);
+
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	/**
+	 * Search for a link
+	 *
+	 * @param query The query to search
+	 */
+	public List<ExtractedLink> search(String query) {
     /*
     Search for query in the database and return the results
      */
 
-    return null;
-  }
+		return null;
+	}
+
+	public static void main(String[] args) {
+		connect();
+		createNewTable();
+	}
 }

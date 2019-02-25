@@ -15,7 +15,7 @@ import java.util.UUID;
 public class LinkListener {
   public static void main(String[] args) throws SQLException, InterruptedException {
     // Connect to the database
-//    DataStorage dataStorage = new DataStorage("noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com");
+    DataStorage dataStorage = new DataStorage();
 
     // Initiate our link extractor
     LinkExtractor linkExtractor = new LinkExtractor();
@@ -35,12 +35,12 @@ public class LinkListener {
 	    		String url = message.getBody();
 	    		// Extracting the Url content
 				ExtractedLink extractedLink = linkExtractor.extractContent(url);
-			    System.out.println("URL: " + extractedLink.getUrl());
-			    System.out.println("Title: " + extractedLink.getTitle());
-			    System.out.println("Content: " + extractedLink.getContent());
-			    // Take screenshot
-			    String fileLocation = ScreenshotGenerator.takeScreenshot(url);
-			    System.out.println("Screenshot location: " + fileLocation);
+				dataStorage.addLink(extractedLink, "USA");
+//			    System.out.println("URL: " + extractedLink.getUrl());
+//			    System.out.println("Title: " + extractedLink.getTitle());
+//			    System.out.println("Content: " + extractedLink.getContent());
+//			    System.out.println("Description: " + extractedLink.getDescription());
+//			    System.out.println("Screenshot URL: " + extractedLink.getScreenshotURL());
 		    }
 	    }
     }

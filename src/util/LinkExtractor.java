@@ -31,7 +31,9 @@ public class LinkExtractor {
 	  assert doc != null;
 	  String title = doc.title();
 	  String content = doc.body().text();
-      ExtractedLink extractedLink = new ExtractedLink(url, content, title, null, null);
+	  // Take screenshot
+	  String screenshotUrl = ScreenshotGenerator.takeScreenshot(url);
+      ExtractedLink extractedLink = new ExtractedLink(url, content, title, null, screenshotUrl);
 
     return extractedLink;
   }
