@@ -44,7 +44,5 @@ public class LinkListener {
 		    }
 	    }
     }
-
-    // Save everything in the database
   }
 }
