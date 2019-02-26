@@ -6,12 +6,9 @@ import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import org.json.JSONObject;
 import util.DataStorage;
 import util.LinkExtractor;
-import util.ScreenshotGenerator;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 public class LinkListener {
   public static void main(String[] args) throws SQLException, InterruptedException {

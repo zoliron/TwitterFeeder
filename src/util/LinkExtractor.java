@@ -6,6 +6,14 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
+import com.amazonaws.services.cloudwatch.model.Dimension;
+import com.amazonaws.services.cloudwatch.model.MetricDatum;
+import com.amazonaws.services.cloudwatch.model.PutMetricDataRequest;
+import com.amazonaws.services.cloudwatch.model.PutMetricDataResult;
+import com.amazonaws.services.cloudwatch.model.StandardUnit;
+
 /**
  * Extract content from links
  */
@@ -22,6 +30,11 @@ public class LinkExtractor {
     take the first.
      */
 
+	  // Create Amazon CloudWatch
+	  final AmazonCloudWatch cw = AmazonCloudWatchClientBuilder.defaultClient();
+
+	  double startScanTime = System.nanoTime();
+
 	  Document doc = null;
 	  try{
 		  doc = Jsoup.connect(url).get();
@@ -37,8 +50,44 @@ public class LinkExtractor {
 				  .attr("content");
 	  } catch (Exception e){
 	  }
+	  double endScanTime = (System.nanoTime() - startScanTime) / 1000000;
+
+	  Dimension scanningDimension = new Dimension()
+			  .withName("ExtractTime")
+			  .withValue("Scanning Time");
+
+	  MetricDatum scanningDatum = new MetricDatum()
+			  .withMetricName("Site Scanning")
+			  .withUnit(StandardUnit.None)
+			  .withValue(endScanTime)
+			  .withDimensions(scanningDimension);
+
+	  PutMetricDataRequest scanningRequest = new PutMetricDataRequest()
+			  .withNamespace("Noy&Ronen")
+			  .withMetricData(scanningDatum);
+
+	  PutMetricDataResult scanningResponse = cw.putMetricData(scanningRequest);
+
 	  // Take screenshot
+	  double startScreenshotTime = System.nanoTime();
 	  String screenshotUrl = ScreenshotGenerator.takeScreenshot(url);
+	  double endScreenshotTime = (System.nanoTime() - startScreenshotTime) / 1000000;
+
+	  Dimension screenshotDimension = new Dimension()
+			  .withName("ExtractTime")
+			  .withValue("Screenshot Time");
+
+	  MetricDatum screenshotDdatum = new MetricDatum()
+			  .withMetricName("Screenshot")
+			  .withUnit(StandardUnit.None)
+			  .withValue(endScreenshotTime)
+			  .withDimensions(screenshotDimension);
+
+	  PutMetricDataRequest request = new PutMetricDataRequest()
+			  .withNamespace("Noy&Ronen")
+			  .withMetricData(screenshotDdatum);
+
+	  PutMetricDataResult response = cw.putMetricData(request);
       ExtractedLink extractedLink = new ExtractedLink(url, content, title, description, screenshotUrl);
 
     return extractedLink;
