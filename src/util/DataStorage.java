@@ -40,25 +40,20 @@ public class DataStorage {
 		Connection conn = null;
 		Statement setupStatement = null;
 		try {
-//			// AWS RDS parameters
-//			String url = "jdbc:mysql://noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com/TwitterFeeder";
-//			String username = "noyIshai";
-//			String password = "abc552346";
-//
 //			// create a connection to the database
-//			conn = DriverManager.getConnection(url, username, password);
 			conn = connect();
 			setupStatement = conn.createStatement();
 
 			// SQL statement for creating a new table
 			String sql = "CREATE TABLE IF NOT EXISTS TF (\n"
-//					+ "	ID integer PRIMARY KEY,\n"
+					+ "	ID integer NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
 					+ "	Link text,\n"
 					+ "	Title text,\n"
 					+ "	Body text,\n"
 					+ " Description text,\n"
 					+ " ScreenshotUrl text,\n"
-					+ " Track text\n"
+					+ " Track text,\n"
+					+ " Timestamp text\n"
 					+ ");";
 
 			setupStatement.addBatch(sql);
@@ -77,7 +72,8 @@ public class DataStorage {
     /*
     This is where we'll add our link
      */
-		String sql = "INSERT INTO TF(Link,Title,Body,Description,ScreenshotUrl,Track) VALUES(?,?,?,?,?,?)";
+		String sql = "INSERT INTO TF(Link,Title,Body,Description,ScreenshotUrl,Track,Timestamp) VALUES(?,?,?,?,?,?,?)";
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
 		try (Connection conn = connect();
 		     PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -87,6 +83,8 @@ public class DataStorage {
 			pstmt.setString(4, link.getDescription());
 			pstmt.setString(5, link.getScreenshotURL());
 			pstmt.setString(6, track);
+			pstmt.setString(7, String.valueOf(currentTimestamp));
+
 
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
@@ -108,7 +106,7 @@ public class DataStorage {
 	}
 
 	public static void main(String[] args) {
-		connect();
+//		connect();
 		createNewTable();
 	}
 }
