@@ -46,19 +46,22 @@ public class TwitterListener {
 						for (URLEntity entity : urlEntities) {
 							String link = entity.getExpandedURL();
 							// Sending the links to SQS
-							String track = "USA";
+							String track = System.getProperty("track");
+//							String track = "USA";
 							JSONObject message = new JSONObject();
 							try {
 								message.put("link", link);
 								message.put("track", track);
 							} catch (JSONException e) {
 							}
+
 							System.out.println(message.toString());
 							client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", message.toString());
+
 							Dimension dimension = new Dimension()
 									.withName("LinksCount")
 									.withValue(track);
-							
+
 							MetricDatum datum = new MetricDatum()
 									.withMetricName("TwitterListener")
 									.withUnit(StandardUnit.None)
