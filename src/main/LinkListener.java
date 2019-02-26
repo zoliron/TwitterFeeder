@@ -3,6 +3,7 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import org.json.JSONObject;
 import util.DataStorage;
 import util.LinkExtractor;
 import util.ScreenshotGenerator;
@@ -32,10 +33,13 @@ public class LinkListener {
 	    	Thread.sleep(5000);
 	    } else {
 	    	for (Message message : messages){
-	    		String url = message.getBody();
+	    		String messageBody = message.getBody();
+			    JSONObject messageBodyJSON = new JSONObject(messageBody);
+			    String url = messageBodyJSON.get("link").toString();
+			    String track = messageBodyJSON.get("track").toString();
 	    		// Extracting the Url content
 				ExtractedLink extractedLink = linkExtractor.extractContent(url);
-				dataStorage.addLink(extractedLink, "USA");
+				dataStorage.addLink(extractedLink, track);
 //			    System.out.println("URL: " + extractedLink.getUrl());
 //			    System.out.println("Title: " + extractedLink.getTitle());
 //			    System.out.println("Content: " + extractedLink.getContent());

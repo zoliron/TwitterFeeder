@@ -41,7 +41,15 @@ public class TwitterListener {
                       for (URLEntity entity : urlEntities){
                           String link = entity.getExpandedURL();
                           // Sending the links to SQS
-	                      client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", link);
+                          String track = "USA";
+                          JSONObject message = new JSONObject();
+	                      try {
+		                      message.put("link", link);
+		                      message.put("track", track);
+	                      } catch (JSONException e) {
+	                      }
+	                      System.out.println(message.toString());
+	                      client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", message.toString());
                       }
                   }
               }
