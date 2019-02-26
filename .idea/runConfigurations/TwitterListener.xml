@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TwitterListener" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="main.TwitterListener" />
+    <module name="TwitterNew" />
+    <option name="VM_PARAMETERS" value="-Dconfig.twitter.consumer.key=LFAkkd57cv7VqF7UJuTyAQ7Ry -Dconfig.twitter.consumer.secret=eQnYQZeQZLwbRZtL63UHZN5QmSW8vOobFpqqP0ikGxByg3UHcd -Dconfig.twitter.access.token=1060192009867198465-a1t1RHXd2uDbBXTC45YavDs1YRHyF6 -Dconfig.twitter.access.secret=mO1GDUrVhhiEAEazm6FvbPsuBs9BOy3lpJWYLGu8vDBdg -Dconfig.twitter.track=USA -Dconfig.sqs.url=https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="main.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
