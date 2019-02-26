@@ -24,10 +24,10 @@ public class TwitterListener {
 		final AmazonCloudWatch cw = AmazonCloudWatchClientBuilder.defaultClient();
 
 		cb.setDebugEnabled(true)
-				.setOAuthConsumerKey("LFAkkd57cv7VqF7UJuTyAQ7Ry")
-				.setOAuthConsumerSecret("eQnYQZeQZLwbRZtL63UHZN5QmSW8vOobFpqqP0ikGxByg3UHcd")
-				.setOAuthAccessToken("1060192009867198465-a1t1RHXd2uDbBXTC45YavDs1YRHyF6")
-				.setOAuthAccessTokenSecret("mO1GDUrVhhiEAEazm6FvbPsuBs9BOy3lpJWYLGu8vDBdg");
+				.setOAuthConsumerKey(System.getProperty("config.twitter.consumer.key"))
+				.setOAuthConsumerSecret(System.getProperty("config.twitter.consumer.secret"))
+				.setOAuthAccessToken(System.getProperty("config.twitter.access.token"))
+				.setOAuthAccessTokenSecret(System.getProperty("config.twitter.access.secret"));
 
 		// Create our Twitter stream
 		TwitterStreamFactory tf = new TwitterStreamFactory(cb.build());
@@ -46,7 +46,7 @@ public class TwitterListener {
 						for (URLEntity entity : urlEntities) {
 							String link = entity.getExpandedURL();
 							// Sending the links to SQS
-							String track = System.getProperty("track");
+							String track = System.getProperty("config.twitter.track");
 //							String track = "USA";
 							JSONObject message = new JSONObject();
 							try {
@@ -56,7 +56,7 @@ public class TwitterListener {
 							}
 
 							System.out.println(message.toString());
-							client.sendMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai", message.toString());
+							client.sendMessage(System.getProperty("config.sqs.url"), message.toString());
 
 							Dimension dimension = new Dimension()
 									.withName("LinksCount")
