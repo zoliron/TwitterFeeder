@@ -50,7 +50,7 @@ public class LinkExtractor {
 				  .attr("content");
 	  } catch (Exception e){
 	  }
-	  double endScanTime = (System.nanoTime() - startScanTime) / 1000000;
+	  double endScanTime = (System.nanoTime() - startScanTime) / 1000000000;
 
 	  Dimension scanningDimension = new Dimension()
 			  .withName("ExtractTime")
@@ -71,7 +71,7 @@ public class LinkExtractor {
 	  // Take screenshot
 	  double startScreenshotTime = System.nanoTime();
 	  String screenshotUrl = ScreenshotGenerator.takeScreenshot(url);
-	  double endScreenshotTime = (System.nanoTime() - startScreenshotTime) / 1000000;
+	  double endScreenshotTime = (System.nanoTime() - startScreenshotTime) / 1000000000;
 
 	  Dimension screenshotDimension = new Dimension()
 			  .withName("ExtractTime")

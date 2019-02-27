@@ -19,14 +19,14 @@ public class DataStorage {
 	final AmazonCloudWatch cw = AmazonCloudWatchClientBuilder.defaultClient();
 
 	public DataStorage() {
+		conn = connect();
 		createNewTable();
 	}
 
 	/**
 	 * Connect to a sample database
 	 */
-	public static Connection connect() {
-		Connection conn = null;
+	public Connection connect() {
 		try {
 			// AWS RDS parameters
 			String url = "jdbc:mysql://noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com/TwitterFeeder";
@@ -43,12 +43,9 @@ public class DataStorage {
 		return null;
 	}
 
-	public static void createNewTable() {
-		Connection conn = null;
+	public void createNewTable() {
 		Statement setupStatement = null;
 		try {
-//			// create a connection to the database
-			conn = connect();
 			setupStatement = conn.createStatement();
 
 			// SQL statement for creating a new table
@@ -82,8 +79,13 @@ public class DataStorage {
 		String sql = "INSERT INTO TF(Link,Title,Body,Description,ScreenshotUrl,Track,Timestamp) VALUES(?,?,?,?,?,?,?)";
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-		try (Connection conn = connect();
-		     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+//		int tableSize = getTableSize();
+//		if (tableSize > 5) {
+//			Connection conn = connect();
+//			Statement statement = conn.createStatement();
+//			ResultSet resultSet = statement.executeQuery("DELETE FROM TwitterFeeder.TF where ID > 5");
+//		}
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, link.getUrl());
 			pstmt.setString(2, link.getTitle());
 			pstmt.setString(3, link.getContent());
@@ -108,7 +110,6 @@ public class DataStorage {
     Search for query in the database and return the results
      */
 		List<ExtractedLink> extractedLinks = new ArrayList<>();
-		Connection conn = connect();
 
 		double startQueryTime = System.nanoTime();
 		try {
@@ -139,7 +140,7 @@ public class DataStorage {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		double endQueryTime = (System.nanoTime() - startQueryTime) / 1000000;
+		double endQueryTime = (System.nanoTime() - startQueryTime) / 1000000000;
 		Dimension screenshotDimension = new Dimension()
 				.withName("Querys Times")
 				.withValue("Search Time");
@@ -159,14 +160,29 @@ public class DataStorage {
 		return extractedLinks;
 	}
 
+	public int getTableSize() {
+		int size = 0;
+		Statement statement = null;
+		try {
+			statement = conn.createStatement();
+			ResultSet resultSet = statement.executeQuery("SELECT * FROM TwitterFeeder.TF");
+			while (resultSet.next())
+				size = resultSet.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return size;
+	}
+
 	public static void main(String[] args) {
-//		connect();
-		createNewTable();
 		DataStorage dataStorage = new DataStorage();
 		List<ExtractedLink> extractedLinks = new ArrayList<>();
 		extractedLinks = dataStorage.search("SELECT * FROM TwitterFeeder.TF");
 		for (ExtractedLink link : extractedLinks) {
 			System.out.println(link.getUrl());
 		}
+		int size = dataStorage.getTableSize();
+		System.out.println(size);
 	}
 }

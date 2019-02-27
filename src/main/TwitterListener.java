@@ -29,6 +29,7 @@ public class TwitterListener {
 		TwitterStreamFactory tf = new TwitterStreamFactory(cb.build());
 		final TwitterStream twitterStream = tf.getInstance();
 
+		final double[] linkCount = {0};
     /*
       This is where we should start fetching the tweets using the Streaming API
       See Example 9 on this page: http://twitter4j.org/en/code-examples.html#streaming
@@ -51,6 +52,8 @@ public class TwitterListener {
 							}
 
 							System.out.println(message.toString());
+							linkCount[0]++;
+							System.out.println(linkCount[0]);
 							client.sendMessage(System.getProperty("config.sqs.url"), message.toString());
 
 							Dimension dimension = new Dimension()
@@ -60,7 +63,7 @@ public class TwitterListener {
 							MetricDatum datum = new MetricDatum()
 									.withMetricName("TwitterListener")
 									.withUnit(StandardUnit.None)
-									.withValue(1.0)
+									.withValue(linkCount[0])
 									.withDimensions(dimension);
 
 							PutMetricDataRequest request = new PutMetricDataRequest()

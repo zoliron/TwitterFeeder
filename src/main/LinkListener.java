@@ -23,6 +23,8 @@ public class LinkListener {
 		// Configure our client
 		AmazonSQS client = AmazonSQSAsyncClientBuilder.defaultClient();
 
+		int linkCount = 0;
+
 		// Extract the link content
 		while (true) {
 			ReceiveMessageResult result = client.receiveMessage(System.getProperty("config.sqs.url"));
@@ -39,6 +41,8 @@ public class LinkListener {
 					// Extracting the Url content
 					ExtractedLink extractedLink = linkExtractor.extractContent(url);
 					dataStorage.addLink(extractedLink, track);
+					linkCount++;
+					System.out.println("Link number " + linkCount +  " added to AWS RDS");
 //			    System.out.println("URL: " + extractedLink.getUrl());
 //			    System.out.println("Title: " + extractedLink.getTitle());
 //			    System.out.println("Content: " + extractedLink.getContent());
