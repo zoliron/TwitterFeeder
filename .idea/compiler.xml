@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="TwitterNew" target="10" />
+      <module name="TwitterNew" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

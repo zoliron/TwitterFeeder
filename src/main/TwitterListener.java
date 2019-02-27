@@ -101,7 +101,7 @@ public class TwitterListener {
 
 		twitterStream.addListener(listener);
 		FilterQuery tweetFilterQuery = new FilterQuery(); // See
-		tweetFilterQuery.track("USA"); // OR on keywords
+		tweetFilterQuery.track(System.getProperty("config.twitter.track")); // OR on keywords
 		tweetFilterQuery.language("en"); // Note that language does not work properly on Norwegian tweets
 		twitterStream.filter(tweetFilterQuery);
 

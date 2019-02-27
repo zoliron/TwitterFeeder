@@ -1,8 +1,12 @@
 package util;
 
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
+import com.amazonaws.services.cloudwatch.model.*;
 import main.ExtractedLink;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,6 +14,9 @@ import java.util.List;
  */
 public class DataStorage {
 	Connection conn;
+
+	// Create Amazon CloudWatch
+	final AmazonCloudWatch cw = AmazonCloudWatchClientBuilder.defaultClient();
 
 	public DataStorage() {
 		createNewTable();
@@ -36,7 +43,7 @@ public class DataStorage {
 		return null;
 	}
 
-		public static void createNewTable() {
+	public static void createNewTable() {
 		Connection conn = null;
 		Statement setupStatement = null;
 		try {
@@ -85,7 +92,6 @@ public class DataStorage {
 			pstmt.setString(6, track);
 			pstmt.setString(7, String.valueOf(currentTimestamp));
 
-
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -101,12 +107,66 @@ public class DataStorage {
     /*
     Search for query in the database and return the results
      */
+		List<ExtractedLink> extractedLinks = new ArrayList<>();
+		Connection conn = connect();
 
-		return null;
+		double startQueryTime = System.nanoTime();
+		try {
+			Statement statement = conn.createStatement();
+			if (query.equals("")) {
+				ResultSet resultSet = statement.executeQuery("SELECT * FROM TwitterFeeder.TF");
+				while (resultSet.next()) {
+					String link = resultSet.getString(2);
+					String title = resultSet.getString(3);
+					String body = resultSet.getString(4);
+					String description = resultSet.getString(5);
+					String screenshotURL = resultSet.getString(6);
+					ExtractedLink extractedLink = new ExtractedLink(link, body, title, description, screenshotURL);
+					extractedLinks.add(extractedLink);
+				}
+			} else {
+				ResultSet resultSet = statement.executeQuery(query);
+				while (resultSet.next()) {
+					String link = resultSet.getString(2);
+					String title = resultSet.getString(3);
+					String body = resultSet.getString(4);
+					String description = resultSet.getString(5);
+					String screenshotURL = resultSet.getString(6);
+					ExtractedLink extractedLink = new ExtractedLink(link, body, title, description, screenshotURL);
+					extractedLinks.add(extractedLink);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		double endQueryTime = (System.nanoTime() - startQueryTime) / 1000000;
+		Dimension screenshotDimension = new Dimension()
+				.withName("Querys Times")
+				.withValue("Search Time");
+
+		MetricDatum screenshotDdatum = new MetricDatum()
+				.withMetricName("Querys")
+				.withUnit(StandardUnit.None)
+				.withValue(endQueryTime)
+				.withDimensions(screenshotDimension);
+
+		PutMetricDataRequest request = new PutMetricDataRequest()
+				.withNamespace("Noy&Ronen")
+				.withMetricData(screenshotDdatum);
+
+		PutMetricDataResult response = cw.putMetricData(request);
+
+		return extractedLinks;
 	}
 
 	public static void main(String[] args) {
 //		connect();
 		createNewTable();
+		DataStorage dataStorage = new DataStorage();
+		List<ExtractedLink> extractedLinks = new ArrayList<>();
+		extractedLinks = dataStorage.search("SELECT * FROM TwitterFeeder.TF");
+		for (ExtractedLink link : extractedLinks) {
+			System.out.println(link.getUrl());
+		}
 	}
 }

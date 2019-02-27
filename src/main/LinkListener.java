@@ -1,4 +1,5 @@
 package main;
+
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
@@ -11,39 +12,40 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class LinkListener {
-  public static void main(String[] args) throws SQLException, InterruptedException {
-    // Connect to the database
-    DataStorage dataStorage = new DataStorage();
+	public static void main(String[] args) throws SQLException, InterruptedException {
+		// Connect to the database
+		DataStorage dataStorage = new DataStorage();
 
-    // Initiate our link extractor
-    LinkExtractor linkExtractor = new LinkExtractor();
+		// Initiate our link extractor
+		LinkExtractor linkExtractor = new LinkExtractor();
 
-    // Listen to SQS for arriving links
-    // Configure our client
-    AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
-    // Extract the link content
-    while(true) {
-	    ReceiveMessageResult result = client.receiveMessage("https://sqs.us-east-1.amazonaws.com/135062767808/NoyIshai");
+		// Listen to SQS for arriving links
+		// Configure our client
+		AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
 
-	    List<Message> messages = result.getMessages();
-	    if (messages.size() == 0){
-	    	Thread.sleep(5000);
-	    } else {
-	    	for (Message message : messages){
-	    		String messageBody = message.getBody();
-			    JSONObject messageBodyJSON = new JSONObject(messageBody);
-			    String url = messageBodyJSON.get("link").toString();
-			    String track = messageBodyJSON.get("track").toString();
-	    		// Extracting the Url content
-				ExtractedLink extractedLink = linkExtractor.extractContent(url);
-				dataStorage.addLink(extractedLink, track);
+		// Extract the link content
+		while (true) {
+			ReceiveMessageResult result = client.receiveMessage(System.getProperty("config.sqs.url"));
+
+			List<Message> messages = result.getMessages();
+			if (messages.size() == 0) {
+				Thread.sleep(5000);
+			} else {
+				for (Message message : messages) {
+					String messageBody = message.getBody();
+					JSONObject messageBodyJSON = new JSONObject(messageBody);
+					String url = messageBodyJSON.get("link").toString();
+					String track = messageBodyJSON.get("track").toString();
+					// Extracting the Url content
+					ExtractedLink extractedLink = linkExtractor.extractContent(url);
+					dataStorage.addLink(extractedLink, track);
 //			    System.out.println("URL: " + extractedLink.getUrl());
 //			    System.out.println("Title: " + extractedLink.getTitle());
 //			    System.out.println("Content: " + extractedLink.getContent());
 //			    System.out.println("Description: " + extractedLink.getDescription());
 //			    System.out.println("Screenshot URL: " + extractedLink.getScreenshotURL());
-		    }
-	    }
-    }
-  }
+				}
+			}
+		}
+	}
 }
