@@ -1,7 +1,7 @@
 package main;
 
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import org.json.JSONObject;
@@ -21,7 +21,7 @@ public class LinkListener {
 
 		// Listen to SQS for arriving links
 		// Configure our client
-		AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
+		AmazonSQS client = AmazonSQSAsyncClientBuilder.defaultClient();
 
 		// Extract the link content
 		while (true) {

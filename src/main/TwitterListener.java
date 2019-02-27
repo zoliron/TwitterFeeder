@@ -1,16 +1,12 @@
 package main;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import twitter4j.*;
-import twitter4j.conf.ConfigurationBuilder;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
-import com.amazonaws.services.cloudwatch.model.Dimension;
-import com.amazonaws.services.cloudwatch.model.MetricDatum;
-import com.amazonaws.services.cloudwatch.model.PutMetricDataRequest;
-import com.amazonaws.services.cloudwatch.model.PutMetricDataResult;
-import com.amazonaws.services.cloudwatch.model.StandardUnit;
+import com.amazonaws.services.cloudwatch.model.*;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import twitter4j.*;
+import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterListener {
 	public static void main(String[] args) {
@@ -18,7 +14,7 @@ public class TwitterListener {
 		final ConfigurationBuilder cb = new ConfigurationBuilder();
 
 		// Create AmazonSQS
-		final AmazonSQS client = AmazonSQSClientBuilder.defaultClient();
+		final AmazonSQS client = AmazonSQSAsyncClientBuilder.defaultClient();
 
 		// Create Amazon CloudWatch
 		final AmazonCloudWatch cw = AmazonCloudWatchClientBuilder.defaultClient();
@@ -47,7 +43,6 @@ public class TwitterListener {
 							String link = entity.getExpandedURL();
 							// Sending the links to SQS
 							String track = System.getProperty("config.twitter.track");
-//							String track = "USA";
 							JSONObject message = new JSONObject();
 							try {
 								message.put("link", link);
