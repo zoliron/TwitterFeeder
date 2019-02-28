@@ -2,6 +2,7 @@
   <configuration default="false" name="DataStorage" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="util.DataStorage" />
     <module name="TwitterNew" />
+    <option name="VM_PARAMETERS" value="-Dconfig.rds.url=noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com/TwitterFeeder -Dconfig.username=noyIshai -Dconfig.password=abc552346" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="util.*" />
