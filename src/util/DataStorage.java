@@ -33,6 +33,11 @@ public class DataStorage {
 			String username = System.getProperty("config.username");
 			String password = System.getProperty("config.password");
 
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 			// create a connection to the database
 			conn = DriverManager.getConnection(url, username, password);
 			System.out.println("Connection to RDS has been established.");
@@ -81,7 +86,6 @@ public class DataStorage {
 
 		int tableSize = getTableSize();
 		if (tableSize >= 1000) {
-			Connection conn = connect();
 			Statement statement = conn.createStatement();
 			int delete = statement.executeUpdate("DELETE FROM TwitterFeeder.TF LIMIT 1");
 		}
