@@ -29,9 +29,9 @@ public class DataStorage {
 	public Connection connect() {
 		try {
 			// AWS RDS parameters
-			String url = "jdbc:mysql://noyishai-db-instance.cwn8zwzjkufz.us-east-1.rds.amazonaws.com/TwitterFeeder";
-			String username = "noyIshai";
-			String password = "abc552346";
+			String url = "jdbc:mysql://" + System.getProperty("config.rds.url");
+			String username = System.getProperty("config.username");
+			String password = System.getProperty("config.password");
 
 			// create a connection to the database
 			conn = DriverManager.getConnection(url, username, password);
@@ -79,12 +79,12 @@ public class DataStorage {
 		String sql = "INSERT INTO TF(Link,Title,Body,Description,ScreenshotUrl,Track,Timestamp) VALUES(?,?,?,?,?,?,?)";
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-//		int tableSize = getTableSize();
-//		if (tableSize > 5) {
-//			Connection conn = connect();
-//			Statement statement = conn.createStatement();
-//			ResultSet resultSet = statement.executeQuery("DELETE FROM TwitterFeeder.TF where ID > 5");
-//		}
+		int tableSize = getTableSize();
+		if (tableSize >= 1000) {
+			Connection conn = connect();
+			Statement statement = conn.createStatement();
+			int delete = statement.executeUpdate("DELETE FROM TwitterFeeder.TF LIMIT 1");
+		}
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, link.getUrl());
 			pstmt.setString(2, link.getTitle());
@@ -143,18 +143,18 @@ public class DataStorage {
 		}
 		double endQueryTime = (System.nanoTime() - startQueryTime) / 1000000000;
 		Dimension screenshotDimension = new Dimension()
-				.withName("Querys Times")
+				.withName("Queries Times")
 				.withValue("Search Time");
 
-		MetricDatum screenshotDdatum = new MetricDatum()
-				.withMetricName("Querys")
+		MetricDatum screenshotDatum = new MetricDatum()
+				.withMetricName("Queries")
 				.withUnit(StandardUnit.None)
 				.withValue(endQueryTime)
 				.withDimensions(screenshotDimension);
 
 		PutMetricDataRequest request = new PutMetricDataRequest()
 				.withNamespace("Noy&Ronen")
-				.withMetricData(screenshotDdatum);
+				.withMetricData(screenshotDatum);
 
 		PutMetricDataResult response = cw.putMetricData(request);
 
@@ -166,23 +166,23 @@ public class DataStorage {
 		Statement statement = null;
 		try {
 			statement = conn.createStatement();
-			ResultSet resultSet = statement.executeQuery("SELECT * FROM TwitterFeeder.TF");
-			while (resultSet.next())
+			ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM TwitterFeeder.TF");
+			if(resultSet.next()){
 				size = resultSet.getInt(1);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return size;
 	}
 
 	public static void main(String[] args) {
 		DataStorage dataStorage = new DataStorage();
-		List<ExtractedLink> extractedLinks = new ArrayList<>();
-		extractedLinks = dataStorage.search("SELECT * FROM TwitterFeeder.TF");
-		for (ExtractedLink link : extractedLinks) {
-			System.out.println(link.getUrl());
-		}
+//		List<ExtractedLink> extractedLinks = new ArrayList<>();
+//		extractedLinks = dataStorage.search("SELECT * FROM TwitterFeeder.TF");
+//		for (ExtractedLink link : extractedLinks) {
+//			System.out.println(link.getUrl());
+//		}
 		int size = dataStorage.getTableSize();
 		System.out.println(size);
 	}
