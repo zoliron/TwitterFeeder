@@ -41,7 +41,22 @@ public class SearchResultsServer extends AbstractHandler {
     httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
     // Build data from request
-    List<ExtractedLink> results = storage.search(httpServletRequest.getParameter("query"));
+//    List<ExtractedLink> results = storage.search(httpServletRequest.getParameter("query"));
+
+    List<ExtractedLink> results = null;
+    try {
+      if (s.equals("/results")) {
+        // Record the start time
+        long startTime = System.nanoTime();
+        results = storage.search(httpServletRequest.getParameter("query"));
+        // Record end time
+        long endTime = (System.nanoTime() - startTime) / 1000000;
+      }
+    }
+    catch (Exception e){
+//            System.out.println("EXCEPTION");
+      e.printStackTrace();
+    }
 
     // Notify that this request was handled
     request.setHandled(true);
