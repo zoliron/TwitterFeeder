@@ -131,9 +131,10 @@ public class DataStorage {
 					String link = resultSet.getString(2);
 					String title = resultSet.getString(3);
 					String body = resultSet.getString(4);
+					String shortBody = body.substring(0, 99);
 					String description = resultSet.getString(5);
 					String screenshotURL = resultSet.getString(6);
-					ExtractedLink extractedLink = new ExtractedLink(link, body, title, description, screenshotURL);
+					ExtractedLink extractedLink = new ExtractedLink(link, shortBody, title, description, screenshotURL);
 					extractedLinks.add(extractedLink);
 				}
 			}
